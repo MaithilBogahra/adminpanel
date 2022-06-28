@@ -42,7 +42,7 @@ function Medicines(props) {
     }
     handleClose();
     loadData();
-    formik.resetForm();
+    formikobj.resetForm();
   }
 
   let schema = yup.object().shape({
@@ -53,7 +53,7 @@ function Medicines(props) {
 
   });
 
-  const formik = useFormik({
+  const formikobj = useFormik({
     initialValues: {
       name: '',
       price: '',
@@ -86,7 +86,7 @@ function Medicines(props) {
     loadData();
   }, []);
 
-  const { errors, handleChange, handleSubmit, handleBlur, touched } = formik
+  const { errors, handleChange, handleSubmit, handleBlur, touched } = formikobj
   console.log(data);
   return (
     <div>
@@ -104,7 +104,7 @@ function Medicines(props) {
       </div>
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Add Medicine</DialogTitle>
-        <Formik values={formik}>
+        <Formik values={formikobj}>
           <Form onSubmit={handleSubmit}>
             <DialogContent>
               <TextField
