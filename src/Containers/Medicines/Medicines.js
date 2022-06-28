@@ -8,6 +8,8 @@ import DialogTitle from '@mui/material/DialogTitle';
 import * as yup from 'yup';
 import { Form, Formik, useFormik } from 'formik';
 import { DataGrid } from '@mui/x-data-grid';
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 function Medicines(props) {
 
@@ -67,19 +69,38 @@ function Medicines(props) {
     },
   });
 
+  const handleDelete = (params) => {
+    const localData = JSON.parse(localStorage.getItem("Medicines"));
+    const fdata = localData.filter((l) => l.id !== params.id)
+    localStorage.setItem('Medicines', JSON.stringify(fdata))
+    loadData();
+
+  }
+
   const columns = [
 
     { field: 'name', headerName: 'Name', width: 130 },
     { field: 'price', headerName: 'Price', width: 130 },
     { field: 'quntity', headerName: 'Quntity', width: 130 },
     { field: 'expiryDate', headerName: 'ExpiryDate', width: 130 },
-
+    {
+      field: 'action',
+      headerName: 'Action',
+      width: 130,
+      renderCell: (params) => (
+        <IconButton aria-label="delete" onClick={() => handleDelete(params)}>
+          <DeleteIcon />
+        </IconButton>
+      )
+    },
   ];
 
   const loadData = () => {
     let localData = JSON.parse(localStorage.getItem('Medicines'));
+    if (localData !== null) {
+      setData(localData);
+    }
 
-    setData(localData);
   }
 
   useEffect(() => {
@@ -87,7 +108,7 @@ function Medicines(props) {
   }, []);
 
   const { errors, handleChange, handleSubmit, handleBlur, touched } = formikobj
-  console.log(data);
+  // console.log(data);
   return (
     <div>
       <Button variant="outlined" onClick={handleClickOpen}>
