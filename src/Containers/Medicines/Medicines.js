@@ -10,11 +10,24 @@ import { Form, Formik, useFormik } from 'formik';
 import { DataGrid } from '@mui/x-data-grid';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
+import DialogContentText from '@mui/material/DialogContentText';
+import EditIcon from '@mui/icons-material/Edit';
+
+
 
 function Medicines(props) {
 
   const [open, setOpen] = React.useState(false);
   const [data, setData] = useState([]);
+  const [dopen, setDOpen] = React.useState(false);
+  const [did, setDid] = useState(0);
+  const [update, setUpdate] = useState(false);
+
+  const handleDClickOpen = () => {
+    setDOpen(true);
+  };
+
+
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -22,6 +35,7 @@ function Medicines(props) {
 
   const handleClose = () => {
     setOpen(false);
+    setDOpen(false);
   };
 
   const handleInsert = (values) => {
@@ -37,10 +51,10 @@ function Medicines(props) {
     const localData = JSON.parse(localStorage.getItem("Medicines"));
     // console.log(localData);
     if (localData === null) {
-      localStorage.setItem("Medicines", JSON.stringify([data]))
+      localStorage.setItem("Medicines", JSON.stringify([data]));
     } else {
       localData.push(data)
-      localStorage.setItem("Medicines", JSON.stringify(localData))
+      localStorage.setItem("Medicines", JSON.stringify(localData));
     }
     handleClose();
     loadData();
@@ -71,12 +85,19 @@ function Medicines(props) {
 
   const handleDelete = (params) => {
     const localData = JSON.parse(localStorage.getItem("Medicines"));
-    const fdata = localData.filter((l) => l.id !== params.id)
+    const fdata = localData.filter((l) => l.id !== did)
     localStorage.setItem('Medicines', JSON.stringify(fdata))
+    handleClose();
     loadData();
-
   }
 
+  const handleEdit = (params) => {
+    handleClickOpen();
+    console.log(params);
+
+    setUpdate(true);
+    formikobj.setValues(params.row)
+  }
   const columns = [
 
     { field: 'name', headerName: 'Name', width: 130 },
@@ -88,9 +109,14 @@ function Medicines(props) {
       headerName: 'Action',
       width: 130,
       renderCell: (params) => (
-        <IconButton aria-label="delete" onClick={() => handleDelete(params)}>
-          <DeleteIcon />
-        </IconButton>
+        <>
+          <IconButton aria-label="delete" onClick={() => { handleDClickOpen(); setDid(params.id) }}>
+            <DeleteIcon />
+          </IconButton>
+          <IconButton aria-label="delete" onClick={() => handleEdit(params)}>
+            <EditIcon />
+          </IconButton>
+        </>
       )
     },
   ];
@@ -107,7 +133,7 @@ function Medicines(props) {
     loadData();
   }, []);
 
-  const { errors, handleChange, handleSubmit, handleBlur, touched } = formikobj
+  const { errors, handleChange, handleSubmit, handleBlur, touched, values } = formikobj
   // console.log(data);
   return (
     <div>
@@ -123,13 +149,30 @@ function Medicines(props) {
           checkboxSelection
         />
       </div>
-      <Dialog open={open} onClose={handleClose}>
+      <Dialog fullWidth
+        open={dopen}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Are You Sure In Delete?"}
+        </DialogTitle>
+
+        <DialogActions>
+          <Button onClick={handleClose}>No</Button>
+          <Button onClick={handleDelete} autoFocus>
+            Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog fullWidth open={open} onClose={handleClose}>
         <DialogTitle>Add Medicine</DialogTitle>
         <Formik values={formikobj}>
           <Form onSubmit={handleSubmit}>
             <DialogContent>
               <TextField
-
+                value={values.name}
                 margin="dense"
                 id="name"
                 name="name"
@@ -142,7 +185,7 @@ function Medicines(props) {
               />
               {errors.name && touched.name ? <p>{errors.name}</p> : ''}
               <TextField
-
+                value={values.price}
                 margin="dense"
                 id="price"
                 name="price"
@@ -155,7 +198,7 @@ function Medicines(props) {
               />
               {errors.price && touched.price ? <p>{errors.price}</p> : ''}
               <TextField
-
+                value={values.quntity}
                 margin="dense"
                 id="quntity"
                 name="quntity"
@@ -168,7 +211,7 @@ function Medicines(props) {
               />
               {errors.quntity && touched.quntity ? <p>{errors.quntity}</p> : ''}
               <TextField
-
+                value={values.quntity}
                 margin="dense"
                 id="expiryDate"
                 name="expiryDate"

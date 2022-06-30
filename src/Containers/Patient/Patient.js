@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
@@ -7,17 +7,47 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import * as yup from 'yup';
 import { Form, Formik, useFormik } from 'formik';
+import { DataGrid } from '@mui/x-data-grid';
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 function Patient(props) {
     const [open, setOpen] = React.useState(false);
+    const [data, setData] = useState([]);
+    const [dopen, setDOpen] = React.useState(false);
+
+    const handleDClickOpen = () => {
+      setDOpen(true);
+    };
+  
 
     const handleClickOpen = () => {
         setOpen(true);
+        setDOpen(false);
     };
 
     const handleClose = () => {
         setOpen(false);
     };
+
+    const handleAdd = (values) => {
+        let id = Math.floor(Math.random() * 1000);
+
+        let data = {
+            id: id,
+            ...values
+        }
+        const addData = JSON.parse(localStorage.getItem("Patient"));
+        if (addData === null) {
+            localStorage.setItem("Patient", JSON.stringify([data]))
+        } else {
+            addData.push(data);
+            localStorage.setItem("Patient", JSON.stringify(addData));
+        }
+        handleClose();
+        loadData();
+        formikobj.resetForm();
+    }
 
     let schema = yup.object().shape({
         patientname: yup.string().required(),
@@ -33,16 +63,58 @@ function Patient(props) {
         },
         validationSchema: schema,
         onSubmit: values => {
-            alert(JSON.stringify(values, null, 2));
+            handleAdd(values);
         },
+
     });
 
     const { errors, handleBlur, handleChange, handleSubmit, touched } = formikobj
+
+    const columns = [
+
+        { field: 'patientname', headerName: 'Patient name', width: 130 },
+        { field: 'patientage', headerName: 'PatientAge', width: 130 },
+        { field: 'patientaddress', headerName: 'PatientAddress', width: 90, },
+        {
+            field: 'action',
+            headerName: 'Action',
+            width: 90,
+            renderCell: (params) => (
+                <IconButton aria-label="delete" onClick={() => handleRemove(params)}>
+                    <DeleteIcon />
+                </IconButton>
+            )
+        },
+    ];
+    const handleRemove = (params) => {
+        const addData = JSON.parse(localStorage.getItem("Patient"));
+        const fdata = addData.filter((a) => a.id !== params.id)
+        localStorage.setItem("Patient", JSON.stringify(fdata));
+    }
+    const loadData = () => {
+        let localData = JSON.parse(localStorage.getItem('Patient'));
+        if (localData !== null) {
+            setData(localData);
+        }
+    }
+    useEffect(() => {
+        loadData();
+    });
+
     return (
         <div>
             <Button variant="outlined" onClick={handleClickOpen}>
                 Add Patient
             </Button>
+            <div style={{ height: 400, width: '100%' }}>
+                <DataGrid
+                    rows={data}
+                    columns={columns}
+                    pageSize={5}
+                    rowsPerPageOptions={[5]}
+                    checkboxSelection
+                />
+            </div>
             <Dialog open={open} onClose={handleClose}>
                 <DialogTitle>Patient</DialogTitle>
                 <Formik values={formikobj}>
