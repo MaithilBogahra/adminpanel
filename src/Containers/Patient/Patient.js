@@ -10,16 +10,19 @@ import { Form, Formik, useFormik } from 'formik';
 import { DataGrid } from '@mui/x-data-grid';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditOffIcon from '@mui/icons-material/EditOff';
 
 function Patient(props) {
     const [open, setOpen] = React.useState(false);
     const [data, setData] = useState([]);
+    const [did, setDid] = useState();
     const [dopen, setDOpen] = React.useState(false);
+    const [update, setUpdate] = useState(false)
 
     const handleDClickOpen = () => {
-      setDOpen(true);
+        setDOpen(true);
     };
-  
+
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -28,6 +31,7 @@ function Patient(props) {
 
     const handleClose = () => {
         setOpen(false);
+        setDOpen(false);
     };
 
     const handleAdd = (values) => {
@@ -48,6 +52,28 @@ function Patient(props) {
         loadData();
         formikobj.resetForm();
     }
+    const handleEdit = (params) => {
+        handleClickOpen();
+
+        setUpdate(true)
+        formikobj.setValues(params.row)
+        console.log(params);
+    }
+    const handleUpdataData = (values) => {
+        const addData = JSON.parse(localStorage.getItem("Patient"));
+        const ldata = addData.map((l) => {
+            if (l.id === values.id) {
+                return values;
+            } else {
+                return l;
+            }
+        })
+        localStorage.setItem("Patient", JSON.stringify(ldata));
+        handleClose();
+        loadData()
+        setUpdate(false);
+        formikobj.resetForm();
+    }
 
     let schema = yup.object().shape({
         patientname: yup.string().required(),
@@ -63,12 +89,16 @@ function Patient(props) {
         },
         validationSchema: schema,
         onSubmit: values => {
-            handleAdd(values);
+            if (update) {
+                handleUpdataData(values)
+            } else {
+                handleAdd(values);
+            }
         },
 
     });
 
-    const { errors, handleBlur, handleChange, handleSubmit, touched } = formikobj
+    const { errors, handleBlur, handleChange, handleSubmit, touched, values } = formikobj
 
     const columns = [
 
@@ -80,16 +110,24 @@ function Patient(props) {
             headerName: 'Action',
             width: 90,
             renderCell: (params) => (
-                <IconButton aria-label="delete" onClick={() => handleRemove(params)}>
-                    <DeleteIcon />
-                </IconButton>
+                <>
+                    <IconButton aria-label="delete" onClick={() => { handleDClickOpen(); setDid(params.id) }}>
+                        <DeleteIcon />
+                    </IconButton>
+                    <IconButton aria-label="edit" onClick={() => handleEdit(params)}>
+                        <EditOffIcon />
+                    </IconButton>
+                </>
             )
         },
     ];
     const handleRemove = (params) => {
         const addData = JSON.parse(localStorage.getItem("Patient"));
-        const fdata = addData.filter((a) => a.id !== params.id)
+        const fdata = addData.filter((a) => a.id !== did)
         localStorage.setItem("Patient", JSON.stringify(fdata));
+
+        handleClose();
+        loadData();
     }
     const loadData = () => {
         let localData = JSON.parse(localStorage.getItem('Patient'));
@@ -115,6 +153,22 @@ function Patient(props) {
                     checkboxSelection
                 />
             </div>
+            <Dialog fullWidth
+                open={dopen}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">
+                    {"Are You Sure Delete?"}
+                </DialogTitle>
+                <DialogActions>
+                    <Button onClick={handleClose}>No</Button>
+                    <Button onClick={handleRemove} autoFocus>
+                        Yes
+                    </Button>
+                </DialogActions>
+            </Dialog>
             <Dialog open={open} onClose={handleClose}>
                 <DialogTitle>Patient</DialogTitle>
                 <Formik values={formikobj}>
@@ -123,6 +177,7 @@ function Patient(props) {
 
                             <TextField
                                 margin="dense"
+                                value={values.patientname}
                                 id="patientname"
                                 label="Patient Name"
                                 type="text"
@@ -138,6 +193,7 @@ function Patient(props) {
                             }
                             <TextField
                                 margin="dense"
+                                value={values.patientage}
                                 id="patientage"
                                 label="Patient Age"
                                 type="text"
@@ -153,6 +209,7 @@ function Patient(props) {
                             }
                             <TextField
                                 margin="dense"
+                                value={values.patientaddress}
                                 id="patientaddress"
                                 label="Patient Address"
                                 type="text"
@@ -169,7 +226,12 @@ function Patient(props) {
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={handleClose}>Cancel</Button>
-                            <Button type='submit'>Submit</Button>
+                            {
+                                update ?
+                                    <Button type='submit'>Update</Button>
+                                    :
+                                    <Button type='submit'>Submit</Button>
+                            }
                         </DialogActions>
                     </Form>
                 </Formik>

@@ -10,7 +10,6 @@ import { Form, Formik, useFormik } from 'formik';
 import { DataGrid } from '@mui/x-data-grid';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
-import DialogContentText from '@mui/material/DialogContentText';
 import EditIcon from '@mui/icons-material/Edit';
 
 
@@ -20,14 +19,12 @@ function Medicines(props) {
   const [open, setOpen] = React.useState(false);
   const [data, setData] = useState([]);
   const [dopen, setDOpen] = React.useState(false);
-  const [did, setDid] = useState(0);
+  const [did, setDid] = useState();
   const [update, setUpdate] = useState(false);
 
   const handleDClickOpen = () => {
     setDOpen(true);
   };
-
-
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -78,7 +75,11 @@ function Medicines(props) {
     },
     validationSchema: schema,
     onSubmit: values => {
-      handleInsert(values);
+      if (update) {
+        handleUpdataData(values)
+      } else {
+        handleInsert(values);
+      }
 
     },
   });
@@ -93,10 +94,25 @@ function Medicines(props) {
 
   const handleEdit = (params) => {
     handleClickOpen();
-    console.log(params);
 
     setUpdate(true);
     formikobj.setValues(params.row)
+  }
+  const handleUpdataData = (values) => {
+    let localData = JSON.parse(localStorage.getItem("Medicines"))
+    let Udata = localData.map((l) => {
+      if (l.id === values.id) {
+        return values;
+      } else {
+        return l;
+      }
+    })
+    localStorage.setItem("Medicines", JSON.stringify(Udata));
+    handleClose();
+    setUpdate(false);
+    loadData();
+    formikobj.resetForm();
+    console.log(values);
   }
   const columns = [
 
@@ -113,7 +129,7 @@ function Medicines(props) {
           <IconButton aria-label="delete" onClick={() => { handleDClickOpen(); setDid(params.id) }}>
             <DeleteIcon />
           </IconButton>
-          <IconButton aria-label="delete" onClick={() => handleEdit(params)}>
+          <IconButton aria-label="edit" onClick={() => handleEdit(params)}>
             <EditIcon />
           </IconButton>
         </>
@@ -226,7 +242,13 @@ function Medicines(props) {
             </DialogContent>
             <DialogActions>
               <Button onClick={handleClose}>Cancel</Button>
-              <Button type='submit'>Submit</Button>
+              {
+                update === true ?
+                  <Button type='submit'>Update</Button>
+                  :
+                  <Button type='submit'>Submit</Button>
+              }
+
             </DialogActions>
           </Form>
         </Formik>
