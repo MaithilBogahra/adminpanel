@@ -21,6 +21,7 @@ function Medicines(props) {
   const [dopen, setDOpen] = React.useState(false);
   const [did, setDid] = useState();
   const [update, setUpdate] = useState(false);
+  const [filterData, setfilterData] = useState([]);
 
   const handleDClickOpen = () => {
     setDOpen(true);
@@ -151,14 +152,41 @@ function Medicines(props) {
 
   const { errors, handleChange, handleSubmit, handleBlur, touched, values } = formikobj
   // console.log(data);
+
+  const handleSearch = (val) => {
+    // console.log(val);
+    let localData = JSON.parse(localStorage.getItem('Medicines'))
+    let fdata = localData.filter((l) => (
+      l.name.toLowerCase().includes(val.toLowerCase()) ||
+      l.price.toString().includes(val) ||
+      l.quntity.toString().includes(val) ||
+      l.expiryDate.toString().includes(val)
+    ))
+    setfilterData(fdata);
+  }
+
+  let finalData = filterData.length > 0 ?
+    filterData :
+    data
+
   return (
     <div>
       <Button variant="outlined" onClick={handleClickOpen}>
         Add Medicine
       </Button>
+      <TextField
+
+        id="search"
+        name="search"
+        label="Search Medicine"
+        type="text"
+        fullWidth
+        variant="standard"
+        onChange={(e) => handleSearch(e.target.value)}
+      />
       <div style={{ height: 400, width: '100%' }}>
         <DataGrid
-          rows={data}
+          rows={finalData}
           columns={columns}
           pageSize={5}
           rowsPerPageOptions={[5]}
@@ -227,7 +255,7 @@ function Medicines(props) {
               />
               {errors.quntity && touched.quntity ? <p>{errors.quntity}</p> : ''}
               <TextField
-                value={values.quntity}
+                value={values.expiryDate}
                 margin="dense"
                 id="expiryDate"
                 name="expiryDate"
