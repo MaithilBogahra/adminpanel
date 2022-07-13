@@ -11,13 +11,17 @@ import { DataGrid } from '@mui/x-data-grid';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditOffIcon from '@mui/icons-material/EditOff';
+import Stack from '@mui/material/Stack';
+import Autocomplete from '@mui/material/Autocomplete';
+
 
 function Patient(props) {
     const [open, setOpen] = React.useState(false);
     const [data, setData] = useState([]);
     const [did, setDid] = useState();
     const [dopen, setDOpen] = React.useState(false);
-    const [update, setUpdate] = useState(false)
+    const [update, setUpdate] = useState(false);
+    const [filterData, setfilterData] = useState([]);
 
     const handleDClickOpen = () => {
         setDOpen(true);
@@ -138,15 +142,40 @@ function Patient(props) {
     useEffect(() => {
         loadData();
     });
-                   
+
+    const handleSerch = (val) => {
+        let localData = JSON.parse(localStorage.getItem('Patient'));
+
+        let Fdata = localData.filter((l) => (
+            l.patientname.toLowerCase().includes(val.toLowerCase()) ||
+            l.patientage.toStirng().includes(val) ||
+            l.patientaddress.toStirng().includes(val) 
+
+        ))
+
+        setfilterData(Fdata);
+    }
+
+    const finalData = filterData.length > 0 ? filterData : data
+
     return (
         <div>
             <Button variant="outlined" onClick={handleClickOpen}>
                 Add Patient
             </Button>
+
+            <TextField
+                id="search"
+                label="Serach Patient"
+                type="text"
+                fullWidth
+                variant="standard"
+                onChange={(e) => handleSerch(e.target.value)}
+            />
+            
             <div style={{ height: 400, width: '100%' }}>
                 <DataGrid
-                    rows={data}
+                    rows={finalData}
                     columns={columns}
                     pageSize={5}
                     rowsPerPageOptions={[5]}
