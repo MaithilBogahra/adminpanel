@@ -19,6 +19,7 @@ import ListItemText from '@mui/material/ListItemText';
 import MedicationLiquidIcon from '@mui/icons-material/MedicationLiquid';
 import SpatialAudioIcon from '@mui/icons-material/SpatialAudio';
 import { NavLink } from 'react-router-dom';
+import CountertopsIcon from '@mui/icons-material/Countertops';
 
 
 const drawerWidth = 240;
@@ -104,7 +105,8 @@ export default function Layout({ children }) {
   };
   const listitem = [
     { lable: 'medicines', to: '/medicines', icon: <MedicationLiquidIcon /> },
-    { lable: 'patient', to: '/patient', icon: <SpatialAudioIcon /> }
+    { lable: 'patient', to: '/patient', icon: <SpatialAudioIcon /> },
+    { lable: 'counter', to: '/counter', icon: <CountertopsIcon /> }
   ]
 
   return (

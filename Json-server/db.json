@@ -1,0 +1,53 @@
+{
+  "medicines": [
+    {
+      "id": 1,
+      "name": "Kartik",
+      "price": 50,
+      "quntity":500,
+      "expiryDate":2033
+
+    },
+    {
+      "id": 2,
+      "name": "Maithil",
+      "price": 50,
+      "quntity":500,
+      "expiryDate":2056
+
+    },
+    {
+      "id": 3,
+      "name": "VGVGV",
+      "price": 50,
+      "quntity":500,
+      "expiryDate":2023
+
+    },
+    {
+      "id": 4,
+      "name": "Kartik",
+      "price": 50,
+      "quntity":500,
+      "expiryDate":2033
+    },
+    {
+      "id": 5,
+      "name": "Maithil",
+      "price": 52,
+      "quntity":23,
+      "expiryDate":2033
+    }
+   
+  ],
+  "comments": [
+    {
+      "id": 1,
+      "body": "some comment",
+      "postId": 1
+    }
+  ],
+  "profile": {
+    "name": "typicode"
+  }
+}

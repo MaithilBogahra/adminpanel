@@ -11,6 +11,8 @@ import { DataGrid } from '@mui/x-data-grid';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import { useDispatch, useSelector } from 'react-redux';
+import { getMedicines } from '../../Redux/Action/medicines.action';
 
 
 
@@ -23,6 +25,10 @@ function Medicines(props) {
   const [update, setUpdate] = useState(false);
   const [filterData, setfilterData] = useState([]);
 
+  const dispatch = useDispatch()
+  const medicines = useSelector(state => state.medicines)
+
+  const c = useSelector(state => state.counter)
   const handleDClickOpen = () => {
     setDOpen(true);
   };
@@ -147,9 +153,11 @@ function Medicines(props) {
   }
 
   useEffect(() => {
-    loadData();
+    dispatch(getMedicines());
+    // loadData();
   }, []);
 
+  console.log(medicines)
   const { errors, handleChange, handleSubmit, handleBlur, touched, values } = formikobj
   // console.log(data);
 
@@ -171,9 +179,11 @@ function Medicines(props) {
 
   return (
     <div>
+      <h1>{c.counter}</h1>
       <Button variant="outlined" onClick={handleClickOpen}>
         Add Medicine
       </Button>
+
       <TextField
 
         id="search"
@@ -184,9 +194,10 @@ function Medicines(props) {
         variant="standard"
         onChange={(e) => handleSearch(e.target.value)}
       />
+
       <div style={{ height: 400, width: '100%' }}>
         <DataGrid
-          rows={finalData}
+          rows={medicines.medicines}
           columns={columns}
           pageSize={5}
           rowsPerPageOptions={[5]}
