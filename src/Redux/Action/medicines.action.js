@@ -4,8 +4,9 @@ import * as ActionTypes from '../actiontypes';
 
 export const getMedicines = () => (dispatch) => {
     try {
-
-        fetch(BASE_URL + 'medicines')
+        dispatch(getLoding())
+        setTimeout(function(){
+            fetch(BASE_URL + 'medicine')
             .then(response => {
                 if (response.ok) {
                     return response;
@@ -21,8 +22,17 @@ export const getMedicines = () => (dispatch) => {
                 })
             .then(response => response.json())
             .then(data => dispatch(({ type: ActionTypes.GET_MEDICINES, payload: data })))
-            .catch(error => (error.message));
+            .catch(error => dispatch(getError(error.message)));
+        },2000);
+       
     } catch (error) {
-        console.log(error);
+        dispatch(error.message);
     }
+}
+
+export const getLoding=()=>(dispatch)=>{
+    dispatch({type:ActionTypes.GET_LOADING})
+}
+export const getError = (error) =>(dispatch)=>{
+    dispatch({type:ActionTypes.GET_ERROR, payload:error})
 }

@@ -178,6 +178,14 @@ function Medicines(props) {
     data
 
   return (
+
+
+    medicines.isLoading ? 
+    <p>Loading.....</p>
+    :
+    medicines.error != "" ?
+    <p>{medicines.error}</p>
+    :
     <div>
       <h1>{c.counter}</h1>
       <Button variant="outlined" onClick={handleClickOpen}>

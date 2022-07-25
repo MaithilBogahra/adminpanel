@@ -15,14 +15,20 @@ export const medicinesReducer = (state = initVal, action) => {
                 medicines: action.payload,
                 error: ''
             }
+        case ActionTypes.GET_LOADING:
+            return {
+                ...state,
+                isLoading: true,
+                error: ''
+            }
+        case ActionTypes.GET_ERROR:
+            return {
+                ...state,
+                isLoading: false,
+                medicines:[],
+                error: action.payload
+            }
 
-            // case ActionTypes.ERRORMEDICINES: 
-            // return { 
-            //     ...state,
-            //     isLoading : false,
-            //     medicines: [],
-            //     error: action.payload
-            // }
         default:
             return state
     }
